@@ -389,6 +389,7 @@ class OWM25(owm.OWM):
         if limit is not None:
             params['cnt'] = limit
 
+        self._last_url_call = self._httpclient._build_full_URL(BBOX_CITIES_URL, params)
         json_data = self._httpclient.call_API(BBOX_CITIES_URL, params)
         return self._parsers['observation_list'].parse_JSON(json_data)
 
