@@ -173,9 +173,11 @@ class OWM25(owm.OWM):
         assert type(lat) is float or type(lat) is int, "'lat' must be a float"
         if lat < -90.0 or lat > 90.0:
             raise ValueError("'lat' value must be between -90 and 90")
-        json_data = self._httpclient.call_API(OBSERVATION_URL,
-                                              {'lon': lon, 'lat': lat, 
-                                               'lang': self._language})
+
+        params = {'lon': lon, 'lat': lat, 'lang': self._language}
+
+        json_data = self._httpclient.call_API(OBSERVATION_URL, params)
+        self._last_url_call = self._httpclient._build_full_URL(BBOX_CITIES_URL, params)
         return self._parsers['observation'].parse_JSON(json_data)
 
     def weather_at_id(self, id):
