@@ -326,7 +326,7 @@ class OWM25(owm.OWM):
 
     def weather_at_cities_in_bbox(self, lat_top_left, lon_top_left,
                                     lat_bottom_right, lon_bottom_right,
-                                    zoom=10, cluster=False, limit=None):
+                                    zoom=10, cluster=False, limit=None, async=False):
         """
         @TODO
 
@@ -389,9 +389,15 @@ class OWM25(owm.OWM):
         if limit is not None:
             params['cnt'] = limit
 
+        parser = self._parsers['observation_list'].parse_JSON
+
         self._last_url_call = self._httpclient._build_full_URL(BBOX_CITIES_URL, params)
+
+        if async:
+            return self._last_url_call, parser
+
         json_data = self._httpclient.call_API(BBOX_CITIES_URL, params)
-        return self._parsers['observation_list'].parse_JSON(json_data)
+        return parser(json_data)
 
     def weather_around_coords(self, lat, lon, limit=None):
         """
