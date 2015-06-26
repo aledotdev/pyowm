@@ -178,7 +178,7 @@ class OWM25(owm.OWM):
 
         json_data = self._httpclient.call_API(OBSERVATION_URL, params, timeout=timeout)
         self._last_response_time = self._httpclient._last_response_time
-        self._last_url_call = self._httpclient._build_full_URL(BBOX_CITIES_URL, params)
+        self._last_url_call = self._httpclient._build_full_URL(OBSERVATION_URL, params)
         return self._parsers['observation'].parse_JSON(json_data)
 
     def weather_at_id(self, id):
@@ -484,7 +484,7 @@ class OWM25(owm.OWM):
             raise ValueError("'lat' value must be between -90 and 90")
         params = {'lon': lon, 'lat': lat, 'lang': self._language}
         json_data = self._httpclient.call_API(THREE_HOURS_FORECAST_URL, params, timeout=timeout)
-        self._last_url_call = self._httpclient._build_full_URL(BBOX_CITIES_URL, params)
+        self._last_url_call = self._httpclient._build_full_URL(THREE_HOURS_FORECAST_URL, params)
         self._last_response_time = self._httpclient._last_response_time
         forecast = self._parsers['forecast'].parse_JSON(json_data)
         if forecast is not None:
@@ -595,7 +595,7 @@ class OWM25(owm.OWM):
         if limit is not None:
             params['cnt'] = limit
         json_data = self._httpclient.call_API(DAILY_FORECAST_URL, params, timeout=timeout)
-        self._last_url_call = self._httpclient._build_full_URL(BBOX_CITIES_URL, params)
+        self._last_url_call = self._httpclient._build_full_URL(DAILY_FORECAST_URL, params)
         self._last_response_time = self._httpclient._last_response_time
         forecast = self._parsers['forecast'].parse_JSON(json_data)
         if forecast is not None:
