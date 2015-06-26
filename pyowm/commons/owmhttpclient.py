@@ -10,6 +10,7 @@ except ImportError:
     from urllib2 import HTTPError, URLError
     from urllib import urlencode
 
+import time
 import socket
 from pyowm.exceptions import api_call_error
 
@@ -49,8 +50,12 @@ class OWMHTTPClient(object):
         :raises: *APICallError*
 
         """
+        if timeout is None:
+            timeout = socket._GLOBAL_DEFAULT_TIMEOUT
+
         url = self._build_full_URL(API_endpoint_URL, params_dict)
         cached = self._cache.get(url)
+        st = time.time()
         if cached:
             return cached
         else:
@@ -61,10 +66,13 @@ class OWMHTTPClient(object):
                     from urllib2 import urlopen
                 response = urlopen(url, None, timeout)
             except HTTPError as e:
+                self._last_response_time = time.time() - st
                 raise api_call_error.APICallError(str(e.reason), e)
             except URLError as e:
+                self._last_response_time = time.time() - st 
                 raise api_call_error.APICallError(str(e.reason), e)
             else:
+                self._last_response_time = time.time() - st
                 data = response.read().decode('utf-8')
                 self._cache.set(url, data)
                 return data

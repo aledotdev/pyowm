@@ -152,7 +152,7 @@ class OWM25(owm.OWM):
                                           {'q': name,'lang': self._language})
         return self._parsers['observation'].parse_JSON(json_data)
 
-    def weather_at_coords(self, lat, lon):
+    def weather_at_coords(self, lat, lon, timeout=None):
         """
         Queries the OWM web API for the currently observed weather at the
         specified geographic (eg: 51.503614, -0.107331).
@@ -176,7 +176,7 @@ class OWM25(owm.OWM):
 
         params = {'lon': lon, 'lat': lat, 'lang': self._language}
 
-        json_data = self._httpclient.call_API(OBSERVATION_URL, params)
+        json_data = self._httpclient.call_API(OBSERVATION_URL, params, timeout=timeout)
         self._last_url_call = self._httpclient._build_full_URL(BBOX_CITIES_URL, params)
         return self._parsers['observation'].parse_JSON(json_data)
 
@@ -328,7 +328,7 @@ class OWM25(owm.OWM):
 
     def weather_at_cities_in_bbox(self, lat_top_left, lon_top_left,
                                     lat_bottom_right, lon_bottom_right,
-                                    zoom=10, cluster=False, limit=None):
+                                    zoom=10, cluster=False, limit=None, timeout=None):
         """
         @TODO
 
@@ -392,7 +392,8 @@ class OWM25(owm.OWM):
             params['cnt'] = limit
 
         self._last_url_call = self._httpclient._build_full_URL(BBOX_CITIES_URL, params)
-        json_data = self._httpclient.call_API(BBOX_CITIES_URL, params)
+        json_data = self._httpclient.call_API(BBOX_CITIES_URL, params, timeout=timeout)
+        self._last_response_time = self._httpclient._last_response_time
         return self._parsers['observation_list'].parse_JSON(json_data)
 
     def weather_around_coords(self, lat, lon, limit=None):
@@ -455,7 +456,7 @@ class OWM25(owm.OWM):
         else:
             return None
 
-    def three_hours_forecast_at_coords(self, lat, lon):
+    def three_hours_forecast_at_coords(self, lat, lon, timeout=None):
         """
         Queries the OWM web API for three hours weather forecast for the
         specified geographic coordinate (eg: latitude: 51.5073509,
@@ -481,7 +482,7 @@ class OWM25(owm.OWM):
         if lat < -90.0 or lat > 90.0:
             raise ValueError("'lat' value must be between -90 and 90")
         params = {'lon': lon, 'lat': lat, 'lang': self._language}
-        json_data = self._httpclient.call_API(THREE_HOURS_FORECAST_URL, params)
+        json_data = self._httpclient.call_API(THREE_HOURS_FORECAST_URL, params, timeout=timeout)
         forecast = self._parsers['forecast'].parse_JSON(json_data)
         if forecast is not None:
             forecast.set_interval("3h")
@@ -554,7 +555,7 @@ class OWM25(owm.OWM):
         else:
             return None
 
-    def daily_forecast_at_coords(self, lat, lon, limit=None):
+    def daily_forecast_at_coords(self, lat, lon, limit=None, timeout=None):
         """
         Queries the OWM web API for daily weather forecast for the specified
         geographic coordinate (eg: latitude: 51.5073509, longitude: -0.1277583).
@@ -590,7 +591,7 @@ class OWM25(owm.OWM):
         params = {'lon': lon, 'lat': lat, 'lang': self._language}
         if limit is not None:
             params['cnt'] = limit
-        json_data = self._httpclient.call_API(DAILY_FORECAST_URL, params)
+        json_data = self._httpclient.call_API(DAILY_FORECAST_URL, params, timeout=timeout)
         forecast = self._parsers['forecast'].parse_JSON(json_data)
         if forecast is not None:
             forecast.set_interval("daily")
